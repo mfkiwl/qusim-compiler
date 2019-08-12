@@ -1,0 +1,32 @@
+volatile unsigned long long* const SERIAL_PORT=0x0000000044a00000;
+volatile unsigned long long* const SERIAL_STATUS=0x0000000044a00008;
+char get_char(){
+    char status;
+    char data;
+    while(1){
+        status=*SERIAL_STATUS;
+        if(status&2){
+            data=*SERIAL_PORT;
+            *LED=data;
+            return data;
+        }
+    }
+}
+void write_char(char chr){
+    char status;
+    while(1){
+        status=*SERIAL_STATUS;
+        if(status&1){
+            *SERIAL_PORT=chr;
+            return;
+        }
+    }
+}
+char table[]="0123456789ABCDEF";
+void print(const int val){
+    int i;
+    for(i=0; i<8; i++){
+        write_char(table[((val>>((7-i)<<2))&0xf)]);
+    }
+    write_char('\n');
+}
